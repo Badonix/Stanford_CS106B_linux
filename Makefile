@@ -1,4 +1,4 @@
-# Change all occurences of Fiso with your file name
+# Change all occurrences of Fiso with your file name
 # for example if your file name is main, replace all (Fiso) with (main)
 
 PROGRAM = Fiso
