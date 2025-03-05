@@ -4,11 +4,11 @@
  * This file implements the simpio.h interface.
  */
 
+#include "simpio.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "simpio.h"
 using namespace std;
 
 /*
@@ -18,37 +18,56 @@ using namespace std;
  * <sstream> library to parse that line into a value of the desired type.
  * If that fails, the implementation asks the user for a new value.
  */
-
 int getInteger(string prompt) {
-   int value;
-   string line;
-   while (true) {
-      cout << prompt;
-      getline(cin, line);
-      istringstream stream(line);
-      stream >> value >> ws;
-      if (!stream.fail() && stream.eof()) break;
-      cout << "Illegal integer format. Try again." << endl;
-      if (prompt == "") prompt = "Enter an integer: ";
-   }
-   return value;
+  int value;
+  string line;
+  while (true) {
+    cout << prompt;
+    getline(cin, line);
+    line.erase(0, line.find_first_not_of(" \n\r\t"));
+    line.erase(line.find_last_not_of(" \n\r\t") + 1);
+    if (line.empty()) {
+      continue;
+    }
+    istringstream stream(line);
+    if (stream >> value) {
+      char leftover;
+      if (!(stream >> leftover)) {
+        return value;
+      }
+    }
+    cout << "Illegal integer format. Try again." << endl;
+    if (prompt.empty())
+      prompt = "Enter an integer: ";
+  }
 }
-
 double getReal(string prompt) {
-   double value;
-   string line;
-   while (true) {
-      cout << prompt;
-      getline(cin, line);
-      istringstream stream(line);
-      stream >> value >> ws;
-      if (!stream.fail() && stream.eof()) break;
-      cout << "Illegal numeric format. Try again." << endl;
-      if (prompt == "") prompt = "Enter a number: ";
-   }
-   return value;
-}
+  double value;
+  string line;
+  while (true) {
+    cout << prompt;
+    getline(cin, line);
 
+    line.erase(0, line.find_first_not_of(" \n\r\t"));
+    line.erase(line.find_last_not_of(" \n\r\t") + 1);
+
+    if (line.empty()) {
+      continue;
+    }
+
+    istringstream stream(line);
+    if (stream >> value) {
+      char leftover;
+      if (!(stream >> leftover)) {
+        return value;
+      }
+    }
+
+    cout << "Illegal numeric format. Try again." << endl;
+    if (prompt.empty())
+      prompt = "Enter a number: ";
+  }
+}
 /*
  * Implementation notes: getLine
  * -----------------------------
@@ -60,8 +79,8 @@ double getReal(string prompt) {
  */
 
 string getLine(string prompt) {
-   string line;
-   cout << prompt;
-   getline(cin, line);
-   return line;
+  string line;
+  cout << prompt;
+  getline(cin, line);
+  return line;
 }
