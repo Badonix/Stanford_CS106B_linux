@@ -18,28 +18,25 @@ using namespace std;
  * <sstream> library to parse that line into a value of the desired type.
  * If that fails, the implementation asks the user for a new value.
  */
+
 int getInteger(string prompt) {
   int value;
   string line;
   while (true) {
     cout << prompt;
     getline(cin, line);
-    line.erase(0, line.find_first_not_of(" \n\r\t"));
-    line.erase(line.find_last_not_of(" \n\r\t") + 1);
-    if (line.empty()) {
-      continue;
-    }
+    // Trim leading/trailing whitespace and newlines
+    line.erase(0, line.find_first_not_of(" \n\r\t")); // Trim leading
+    line.erase(line.find_last_not_of(" \n\r\t") + 1); // Trim trailing
     istringstream stream(line);
-    if (stream >> value) {
-      char leftover;
-      if (!(stream >> leftover)) {
-        return value;
-      }
-    }
+    stream >> value;
+    if (!stream.fail() && stream.eof())
+      break; // Check if fully consumed
     cout << "Illegal integer format. Try again." << endl;
-    if (prompt.empty())
+    if (prompt == "")
       prompt = "Enter an integer: ";
   }
+  return value;
 }
 double getReal(string prompt) {
   double value;
@@ -68,6 +65,7 @@ double getReal(string prompt) {
       prompt = "Enter a number: ";
   }
 }
+
 /*
  * Implementation notes: getLine
  * -----------------------------

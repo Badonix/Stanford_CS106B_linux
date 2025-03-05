@@ -5,7 +5,7 @@
 using namespace std;
 
 int main() {
-  string name = getLine("Please enter your name: ");
-  cout << name;
+  float weight = getReal("Please enter your weight: ");
+  cout << weight << endl;
   return 0;
 }
