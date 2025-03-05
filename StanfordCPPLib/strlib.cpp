@@ -4,11 +4,11 @@
  * This file implements the strlib.h interface.
  */
 
+#include "strlib.h"
+#include "error.h"
 #include <cctype>
 #include <iostream>
 #include <sstream>
-#include "error.h"
-#include "strlib.h"
 using namespace std;
 
 /* Function prototypes */
@@ -20,35 +20,35 @@ using namespace std;
  */
 
 string integerToString(int n) {
-   ostringstream stream;
-   stream << n;
-   return stream.str();
+  ostringstream stream;
+  stream << n;
+  return stream.str();
 }
 
 int stringToInteger(string str) {
-   istringstream stream(str);
-   int value;
-   stream >> value >> ws;
-   if (stream.fail() || !stream.eof()) {
-      error("stringToInteger: Illegal integer format (" + str + ")");
-   }
-   return value;
+  istringstream stream(str);
+  int value;
+  stream >> value;
+  if (stream.fail()) { // Remove ws and !stream.eof()
+    error("stringToInteger: Illegal integer format (" + str + ")");
+  }
+  return value;
 }
 
 string realToString(double d) {
-   ostringstream stream;
-   stream << uppercase << d;
-   return stream.str();
+  ostringstream stream;
+  stream << uppercase << d;
+  return stream.str();
 }
 
 double stringToReal(string str) {
-   istringstream stream(str);
-   double value;
-   stream >> value >> ws;
-   if (stream.fail() || !stream.eof()) {
-      error("stringToReal: Illegal floating-point format (" + str + ")");
-   }
-   return value;
+  istringstream stream(str);
+  double value;
+  stream >> value >> ws;
+  if (stream.fail() || !stream.eof()) {
+    error("stringToReal: Illegal floating-point format (" + str + ")");
+  }
+  return value;
 }
 
 /*
@@ -62,19 +62,19 @@ double stringToReal(string str) {
  */
 
 string toUpperCase(string str) {
-   int nChars = str.length();
-   for (int i = 0; i < nChars; i++) {
-      str[i] = toupper(str[i]);
-   }
-   return str;
+  int nChars = str.length();
+  for (int i = 0; i < nChars; i++) {
+    str[i] = toupper(str[i]);
+  }
+  return str;
 }
 
 string toLowerCase(string str) {
-   int nChars = str.length();
-   for (int i = 0; i < nChars; i++) {
-      str[i] = tolower(str[i]);
-   }
-   return str;
+  int nChars = str.length();
+  for (int i = 0; i < nChars; i++) {
+    str[i] = tolower(str[i]);
+  }
+  return str;
 }
 
 /*
@@ -86,12 +86,14 @@ string toLowerCase(string str) {
  */
 
 bool equalsIgnoreCase(string s1, string s2) {
-   if (s1.length() != s2.length()) return false;
-   int nChars = s1.length();
-   for (int i = 0; i < nChars; i++) {
-      if (tolower(s1[i]) != tolower(s2[i])) return false;
-   }
-   return true;
+  if (s1.length() != s2.length())
+    return false;
+  int nChars = s1.length();
+  for (int i = 0; i < nChars; i++) {
+    if (tolower(s1[i]) != tolower(s2[i]))
+      return false;
+  }
+  return true;
 }
 
 /*
@@ -102,42 +104,46 @@ bool equalsIgnoreCase(string s1, string s2) {
  */
 
 bool startsWith(string str, string prefix) {
-   if (str.length() < prefix.length()) return false;
-   int nChars = prefix.length();
-   for (int i = 0; i < nChars; i++) {
-      if (str[i] != prefix[i]) return false;
-   }
-   return true;
+  if (str.length() < prefix.length())
+    return false;
+  int nChars = prefix.length();
+  for (int i = 0; i < nChars; i++) {
+    if (str[i] != prefix[i])
+      return false;
+  }
+  return true;
 }
 
 bool startsWith(string str, char prefix) {
-   return str.length() > 0 && str[0] == prefix;
+  return str.length() > 0 && str[0] == prefix;
 }
 
 bool endsWith(string str, string suffix) {
-   int nChars = suffix.length();
-   int start = str.length() - nChars;
-   if (start < 0) return false;
-   for (int i = 0; i < nChars; i++) {
-      if (str[start + i] != suffix[i]) return false;
-   }
-   return true;
+  int nChars = suffix.length();
+  int start = str.length() - nChars;
+  if (start < 0)
+    return false;
+  for (int i = 0; i < nChars; i++) {
+    if (str[start + i] != suffix[i])
+      return false;
+  }
+  return true;
 }
 
 bool endsWith(string str, char suffix) {
-   return str.length() > 0 && str[str.length() - 1] == suffix;
+  return str.length() > 0 && str[str.length() - 1] == suffix;
 }
 
 string trim(string str) {
-   int finish = str.length() - 1;
-   while (finish >= 0 && isspace(str[finish])) {
-      finish--;
-   }
-   int start = 0;
-   while (start <= finish && isspace(str[start])) {
-      start++;
-   }
-   return str.substr(start, finish - start + 1);
+  int finish = str.length() - 1;
+  while (finish >= 0 && isspace(str[finish])) {
+    finish--;
+  }
+  int start = 0;
+  while (start <= finish && isspace(str[start])) {
+    start++;
+  }
+  return str.substr(start, finish - start + 1);
 }
 
 /*
@@ -148,102 +154,153 @@ string trim(string str) {
 
 static const string STRING_DELIMITERS = ",:)}]\n";
 
-bool stringNeedsQuoting(const string & str) {
-   int n = str.length();
-   for (int i = 0; i < n; i++) {
-      char ch = str[i];
-      if (isspace(ch)) return false;
-      if (STRING_DELIMITERS.find(ch) != string::npos) return true;
-   }
-   return false;
+bool stringNeedsQuoting(const string &str) {
+  int n = str.length();
+  for (int i = 0; i < n; i++) {
+    char ch = str[i];
+    if (isspace(ch))
+      return false;
+    if (STRING_DELIMITERS.find(ch) != string::npos)
+      return true;
+  }
+  return false;
 }
 
-void readQuotedString(istream & is, string & str) {
-   str = "";
-   char ch;
-   while (is.get(ch) && isspace(ch)) {
-      /* Empty */
-   }
-   if (is.fail()) return;
-   if (ch == '\'' || ch == '"') {
-      char delim = ch;
-      while (is.get(ch) && ch != delim) {
-         if (is.fail()) error("Unterminated string");
-         if (ch == '\\') {
-            if (!is.get(ch)) error("Unterminated string");
-            if (isdigit(ch) || ch == 'x') {
-               int base = 8;
-               if (ch == 'x') base = 16;
-               int result = 0;
-               int digit = 0;
-               while (ch != delim) {
-                  if (isdigit(ch)) {
-                     digit = ch - '0';
-                  } else if (isalpha(ch)) {
-                     digit = toupper(ch) - 'A' + 10;
-                  } else {
-                     digit = base;
-                  }
-                  if (digit >= base) break;
-                  result = base * result + digit;
-                  if (!is.get(ch)) error("Unterminated string");
-               }
-               ch = char(result);
-               is.unget();
+void readQuotedString(istream &is, string &str) {
+  str = "";
+  char ch;
+  while (is.get(ch) && isspace(ch)) {
+    /* Empty */
+  }
+  if (is.fail())
+    return;
+  if (ch == '\'' || ch == '"') {
+    char delim = ch;
+    while (is.get(ch) && ch != delim) {
+      if (is.fail())
+        error("Unterminated string");
+      if (ch == '\\') {
+        if (!is.get(ch))
+          error("Unterminated string");
+        if (isdigit(ch) || ch == 'x') {
+          int base = 8;
+          if (ch == 'x')
+            base = 16;
+          int result = 0;
+          int digit = 0;
+          while (ch != delim) {
+            if (isdigit(ch)) {
+              digit = ch - '0';
+            } else if (isalpha(ch)) {
+              digit = toupper(ch) - 'A' + 10;
             } else {
-               switch (ch) {
-                case 'a': ch = '\a'; break;
-                case 'b': ch = '\b'; break;
-                case 'f': ch = '\f'; break;
-                case 'n': ch = '\n'; break;
-                case 'r': ch = '\r'; break;
-                case 't': ch = '\t'; break;
-                case 'v': ch = '\v'; break;
-                case '"': ch = '"'; break;
-                case '\'': ch = '\''; break;
-                case '\\': ch = '\\'; break;
-               }
+              digit = base;
             }
-         }
-         str += ch;
+            if (digit >= base)
+              break;
+            result = base * result + digit;
+            if (!is.get(ch))
+              error("Unterminated string");
+          }
+          ch = char(result);
+          is.unget();
+        } else {
+          switch (ch) {
+          case 'a':
+            ch = '\a';
+            break;
+          case 'b':
+            ch = '\b';
+            break;
+          case 'f':
+            ch = '\f';
+            break;
+          case 'n':
+            ch = '\n';
+            break;
+          case 'r':
+            ch = '\r';
+            break;
+          case 't':
+            ch = '\t';
+            break;
+          case 'v':
+            ch = '\v';
+            break;
+          case '"':
+            ch = '"';
+            break;
+          case '\'':
+            ch = '\'';
+            break;
+          case '\\':
+            ch = '\\';
+            break;
+          }
+        }
       }
-   } else {
       str += ch;
-      int endTrim = 0;
-      while (is.get(ch) && STRING_DELIMITERS.find(ch) == string::npos) {
-         str += ch;
-         if (!isspace(ch)) endTrim = str.length();
-      }
-      if (is) is.unget();
-      str = str.substr(0, endTrim);
-   }
+    }
+  } else {
+    str += ch;
+    int endTrim = 0;
+    while (is.get(ch) && STRING_DELIMITERS.find(ch) == string::npos) {
+      str += ch;
+      if (!isspace(ch))
+        endTrim = str.length();
+    }
+    if (is)
+      is.unget();
+    str = str.substr(0, endTrim);
+  }
 }
 
-void writeQuotedString(ostream & os, const string & str, bool forceQuotes) {
-   if (!forceQuotes && stringNeedsQuoting(str)) forceQuotes = true;
-   if (forceQuotes) os << '"';
-   int len = str.length();
-   for (int i = 0; i < len; i++) {
-      char ch = str.at(i);
-      switch (ch) {
-       case '\a': os << "\\a"; break;
-       case '\b': os << "\\b"; break;
-       case '\f': os << "\\f"; break;
-       case '\n': os << "\\n"; break;
-       case '\r': os << "\\r"; break;
-       case '\t': os << "\\t"; break;
-       case '\v': os << "\\v"; break;
-       case '"': os << oct << "\\" << (int(ch) & 0xFF); break;
-       case '\\': os << "\\\\"; break;
-       default:
-         if (isprint(ch)) {
-            os << ch;
-         } else {
-            ostringstream oss;
-            oss << oct << (int(ch) & 0xFF);
-            os << "\\" << oss.str();
-         }
+void writeQuotedString(ostream &os, const string &str, bool forceQuotes) {
+  if (!forceQuotes && stringNeedsQuoting(str))
+    forceQuotes = true;
+  if (forceQuotes)
+    os << '"';
+  int len = str.length();
+  for (int i = 0; i < len; i++) {
+    char ch = str.at(i);
+    switch (ch) {
+    case '\a':
+      os << "\\a";
+      break;
+    case '\b':
+      os << "\\b";
+      break;
+    case '\f':
+      os << "\\f";
+      break;
+    case '\n':
+      os << "\\n";
+      break;
+    case '\r':
+      os << "\\r";
+      break;
+    case '\t':
+      os << "\\t";
+      break;
+    case '\v':
+      os << "\\v";
+      break;
+    case '"':
+      os << oct << "\\" << (int(ch) & 0xFF);
+      break;
+    case '\\':
+      os << "\\\\";
+      break;
+    default:
+      if (isprint(ch)) {
+        os << ch;
+      } else {
+        ostringstream oss;
+        oss << oct << (int(ch) & 0xFF);
+        os << "\\" << oss.str();
       }
-   }
-   if (forceQuotes) os << '"';
+    }
+  }
+  if (forceQuotes)
+    os << '"';
 }
